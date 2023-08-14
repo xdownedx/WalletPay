@@ -1,6 +1,6 @@
 # WalletPay API Client
 
-A Python client for interacting with the WalletPay API.
+A Python client for interacting with the [WalletPay](https://docs.wallet.tg/pay/#tag/Order-Reconciliation/operation/getOrderAmount) API.
 
 ## Installation
 
