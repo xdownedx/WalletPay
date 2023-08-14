@@ -6,13 +6,13 @@ A Python client for interacting with the WalletPay API.
 
 Install the package using pip:
 
-```pip install wallet_pay```
+```pip install WalletPay```
 
 
 ## Usage
 
 ```python
-from wallet_pay import WalletPayAPI
+from WalletPay import WalletPayAPI
 
 # Initialize the API client
 api = WalletPayAPI(api_key="YOUR_API_KEY")
