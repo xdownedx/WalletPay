@@ -44,7 +44,7 @@ orders = api.get_order_list(offset=0, count=10)
 amount = api.get_order_amount()
 
 ```
-### Synchronous Client
+### Asynchronous Client
 To work with the asynchronous client, you'll need an async environment, such as `asyncio`.
 
 ```python
