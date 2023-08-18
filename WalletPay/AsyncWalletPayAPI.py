@@ -1,8 +1,6 @@
 import aiohttp
 from typing import Optional, Dict, List, Callable
 from WalletPay.types import Order, WalletPayException, WebhookData
-from fastapi import FastAPI
-import uvicorn
 class AsyncWalletPayAPI:
     BASE_URL = "https://pay.wallet.tg/wpay/store-api/v1/"
 

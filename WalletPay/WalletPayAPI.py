@@ -1,6 +1,6 @@
 import requests
 import json
-from typing import Optional, Dict, List, Callable
+from typing import Optional, Dict, List
 from WalletPay.types.Exception import WalletPayException
 from WalletPay.types.Order import Order
 
@@ -15,6 +15,7 @@ class WalletPayAPI:
         :param api_key: The API key to access WalletPay.
         """
         self.api_key = api_key
+
 
     def _make_request(self, method: str, endpoint: str, data: Optional[Dict] = None) -> Dict:
         """
