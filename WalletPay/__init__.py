@@ -1,3 +1,3 @@
-from .WalletPayAPI import WalletPayAPI
-from .Order import Order
-from .Exception import WalletPayException
+from WalletPay.WalletPayAPI import WalletPayAPI
+from WalletPay.AsyncWalletPayAPI import AsyncWalletPayAPI
+from WalletPay import types
