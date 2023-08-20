@@ -1,9 +1,11 @@
 from fastapi import FastAPI, Request, HTTPException
 from .types import Event
+from typing import Union
 from . import WalletPayAPI, AsyncWalletPayAPI
 import logging
 import hmac
 import base64
+
 
 logging.basicConfig(level=logging.INFO)
 
@@ -24,11 +26,12 @@ class WebhookManager:
 
     ALLOWED_IPS = {"172.255.248.29", "172.255.248.12", "127.0.0.1"}
 
-    def __init__(self, client: WalletPayAPI, host: str = "0.0.0.0", port: int = 9123,
+    def __init__(self, client: Union[WalletPayAPI, AsyncWalletPayAPI], host: str = "0.0.0.0", port: int = 9123,
                  webhook_endpoint: str = "/wp_webhook"):
         """
         Initialize the WebhookManager.
 
+        :param client:
         :param host: The host to run the FastAPI server on. Default is "0.0.0.0".
         :param port: The port to run the FastAPI server on. Default is 9123.
         :param webhook_endpoint: The endpoint to listen for incoming webhooks. Default is "/wp_webhook".
@@ -45,7 +48,7 @@ class WebhookManager:
 
         self.app = FastAPI()
 
-    def start(self):
+    async def start(self):
         """
         Start the FastAPI server to listen for incoming webhooks.
         """
@@ -53,7 +56,9 @@ class WebhookManager:
             import uvicorn
             self.register_webhook_endpoint()
             logging.info(f"Webhook is listening at https://{self.host}:{self.port}{self.webhook_endpoint}")
-            uvicorn.run(self.app, host=self.host, port=self.port, access_log=False, log_level="error")
+            runner = uvicorn.Server(
+                config=uvicorn.Config(self.app, host=self.host, port=self.port, access_log=False, log_level="error"))
+            await runner.serve()
 
     def successful_handler(self):
         """
@@ -114,9 +119,6 @@ class WebhookManager:
         ).digest()
 
         expected_signature_b64 = base64.b64encode(expected_signature).decode()
-        logging.info(f"Received signature: {signature}")
-        logging.info(f"Expected signature: {expected_signature_b64}")
-        logging.info(f"Message: {message}")
         if not hmac.compare_digest(expected_signature_b64, signature):
             raise HTTPException(status_code=400, detail="Invalid signature")
 

@@ -1,9 +1,10 @@
+from decimal import Decimal
 import requests
 import json
 from typing import Optional, Dict, List
-from WalletPay.types.Exception import WalletPayException
-from WalletPay.types.OrderPreview import OrderPreview
-from WalletPay.types.OrderReconciliationItem import OrderReconciliationItem
+from WalletPay.types import WalletPayException
+from WalletPay.types import OrderPreview
+from WalletPay.types import OrderReconciliationItem
 
 
 class WalletPayAPI:
@@ -53,7 +54,7 @@ class WalletPayAPI:
         except requests.RequestException as e:
             raise WalletPayException(f"API request failed: {e}")
 
-    def create_order(self, amount: float, currency_code: str, description: str, external_id: str,
+    def create_order(self, amount: Decimal, currency_code: str, description: str, external_id: str,
                      timeout_seconds: int, customer_telegram_user_id: str,
                      return_url: Optional[str] = None, fail_return_url: Optional[str] = None,
                      custom_data: Optional[Dict] = None) -> OrderPreview:

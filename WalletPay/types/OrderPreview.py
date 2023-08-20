@@ -1,5 +1,5 @@
 from typing import Dict
-from WebhookData import MoneyAmount
+from .WebhookData import MoneyAmount
 
 
 class OrderPreview:

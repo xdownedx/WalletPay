@@ -1,8 +1,8 @@
 import aiohttp
 from typing import Optional, Dict, List, Callable
-from WalletPay.types.Exception import WalletPayException
-from WalletPay.types.OrderPreview import OrderPreview
-from WalletPay.types.OrderReconciliationItem import OrderReconciliationItem
+from WalletPay.types import WalletPayException
+from WalletPay.types import OrderPreview
+from WalletPay.types import OrderReconciliationItem
 
 
 class AsyncWalletPayAPI:

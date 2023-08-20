@@ -1,5 +1,5 @@
 from typing import Dict
-from WebhookData import MoneyAmount, PaymentOption
+from .WebhookData import MoneyAmount, PaymentOption
 
 
 class OrderReconciliationItem:
