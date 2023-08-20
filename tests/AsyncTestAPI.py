@@ -1,6 +1,6 @@
 import pytest
 from aioresponses import aioresponses
-from WalletPay.types import Order
+from WalletPay.types import OrderPreview
 from WalletPay import AsyncWalletPayAPI
 
 
@@ -38,7 +38,7 @@ async def test_create_order():
             customer_telegram_user_id="0"
         )
 
-        assert isinstance(order, Order)
+        assert isinstance(order, OrderPreview)
 
 
 @pytest.mark.asyncio
@@ -68,4 +68,4 @@ async def test_get_order_preview():
         api = AsyncWalletPayAPI(api_key="test_key")
         order = await api.get_order_preview(order_id="2703383946854401")
 
-        assert isinstance(order, Order)
+        assert isinstance(order, OrderPreview)
