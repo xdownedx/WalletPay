@@ -2,7 +2,8 @@ import requests
 import json
 from typing import Optional, Dict, List
 from WalletPay.types.Exception import WalletPayException
-from WalletPay.types.Order import Order
+from WalletPay.types.OrderPreview import OrderPreview
+from WalletPay.types.OrderReconciliationItem import OrderReconciliationItem
 
 
 class WalletPayAPI:
@@ -15,7 +16,6 @@ class WalletPayAPI:
         :param api_key: The API key to access WalletPay.
         """
         self.api_key = api_key
-
 
     def _make_request(self, method: str, endpoint: str, data: Optional[Dict] = None) -> Dict:
         """
@@ -56,7 +56,7 @@ class WalletPayAPI:
     def create_order(self, amount: float, currency_code: str, description: str, external_id: str,
                      timeout_seconds: int, customer_telegram_user_id: str,
                      return_url: Optional[str] = None, fail_return_url: Optional[str] = None,
-                     custom_data: Optional[Dict] = None) -> Order:
+                     custom_data: Optional[Dict] = None) -> OrderPreview:
         """
         Create a new order.
 
@@ -70,7 +70,7 @@ class WalletPayAPI:
         :param fail_return_url: URL for redirection after failed payment.
         :param custom_data: Additional order data.
 
-        :return: Order object with information about the created order.
+        :return: OrderPreview object with information about the created order.
 
         Source: https://docs.wallet.tg/pay/#create-order
         """
@@ -93,37 +93,37 @@ class WalletPayAPI:
 
         response_data = self._make_request("POST", "order", data)
         if response_data.get("status") == "SUCCESS":
-            return Order(response_data.get("data"))
+            return OrderPreview(response_data.get("data"))
         raise WalletPayException("Failed to create order")
 
-    def get_order_preview(self, order_id: str) -> Order:
+    def get_order_preview(self, order_id: str) -> OrderPreview:
         """
         Retrieve order information.
 
         :param order_id: Order ID.
-        :return: Order object with information about the order.
+        :return: OrderPreview object with information about the order.
 
         Source: https://docs.wallet.tg/pay/#get-order-preview
         """
         response_data = self._make_request("GET", f"order/preview?id={order_id}")
         if response_data.get("status") == "SUCCESS":
-            return Order(response_data.get("data"))
+            return OrderPreview(response_data.get("data"))
         raise WalletPayException("Failed to retrieve order preview")
 
-    def get_order_list(self, offset: int, count: int) -> List[Order]:
+    def get_order_list(self, offset: int, count: int) -> List[OrderReconciliationItem]:
         """
         Retrieve a list of orders.
 
         :param offset: Pagination offset.
         :param count: Number of orders to return.
-        :return: List of Order objects.
+        :return: List of OrderReconciliationItem objects.
 
         Source: https://docs.wallet.tg/pay/#get-order-list
         """
         response_data = self._make_request("GET", f"reconciliation/order-list?offset={offset}&count={count}")
         if response_data.get("status") == "SUCCESS":
             orders_data = response_data.get("data", {}).get("items", [])
-            return [Order(order_data) for order_data in orders_data]
+            return [OrderReconciliationItem(order_data) for order_data in orders_data]
         raise WalletPayException("Failed to retrieve order list")
 
     def get_order_amount(self) -> int:
@@ -138,4 +138,3 @@ class WalletPayAPI:
         if response_data.get("status") == "SUCCESS":
             return int(response_data.get("data", {}).get("totalAmount"))
         raise WalletPayException("Failed to retrieve order amount")
-

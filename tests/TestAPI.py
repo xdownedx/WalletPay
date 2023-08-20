@@ -1,6 +1,6 @@
 import pytest
 import responses
-from WalletPay.types import Order
+from WalletPay.types import OrderPreview
 from WalletPay import WalletPayAPI
 
 
@@ -37,7 +37,7 @@ def test_create_order():
             customer_telegram_user_id="0"
         )
 
-        assert isinstance(order, Order)
+        assert isinstance(order, OrderPreview)
 
 
 def test_get_order_preview():
@@ -66,5 +66,5 @@ def test_get_order_preview():
         api = WalletPayAPI(api_key="test_key")
         order = api.get_order_preview(order_id="2703383946854401")
 
-        assert isinstance(order, Order)
+        assert isinstance(order, OrderPreview)
 

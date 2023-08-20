@@ -1,11 +1,13 @@
 from fastapi import FastAPI, Request, HTTPException
 from .types import Event
-from  . import WalletPayAPI, AsyncWalletPayAPI
+from . import WalletPayAPI, AsyncWalletPayAPI
 import logging
 import hmac
 import base64
 
 logging.basicConfig(level=logging.INFO)
+
+
 class WebhookManager:
     """
     A manager for handling webhooks from WalletPay.
@@ -21,7 +23,9 @@ class WebhookManager:
     """
 
     ALLOWED_IPS = {"172.255.248.29", "172.255.248.12", "127.0.0.1"}
-    def __init__(self, client: WalletPayAPI, host: str = "0.0.0.0", port: int = 9123, webhook_endpoint: str = "/wp_webhook"):
+
+    def __init__(self, client: WalletPayAPI, host: str = "0.0.0.0", port: int = 9123,
+                 webhook_endpoint: str = "/wp_webhook"):
         """
         Initialize the WebhookManager.
 
@@ -57,6 +61,7 @@ class WebhookManager:
 
         :return: Decorator function.
         """
+
         def decorator(func):
             self.successful_callbacks.append(func)
             return func
@@ -69,6 +74,7 @@ class WebhookManager:
 
         :return: Decorator function.
         """
+
         def decorator(func):
             self.failed_callbacks.append(func)
             return func
@@ -86,7 +92,6 @@ class WebhookManager:
         :param request: The incoming request object.
         :return: A dictionary with a message indicating the result of the webhook processing.
         """
-
 
         client_ip = request.client.host
         if client_ip not in self.ALLOWED_IPS:
