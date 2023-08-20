@@ -7,15 +7,15 @@ class OrderReconciliationItem:
     Represents an item in the order reconciliation list based on the response schema of the API.
 
     Attributes:
-    - id (int): Unique identifier for the order.
-    - status (str): Status of the order, can be one of "ACTIVE", "EXPIRED", "PAID", or "CANCELLED".
-    - amount (dict): Dictionary representing the order amount. This contains subfields like the actual amount, amountFee, amountNet, and the exchange rate.
-    - extrenal_id (str): External identifier for the order.
-    - customer_telegram_user_id (int, optional): Telegram user ID of the order customer.
-    - created_date_time (str): ISO-8601 date-time indicating when the order was created.
-    - expiration_date_time (str): ISO-8601 date-time indicating the expiration of the order timeout.
-    - payment_date_time (str, optional): ISO-8601 date-time indicating when the order was paid.
-    - selected_payment_option (dict): Represents the payment option selected by the user. This has subfields related to the amount, fees, net amount, and exchange rates.
+        id (int): Unique identifier for the order.
+        status (str): Status of the order, can be one of "ACTIVE", "EXPIRED", "PAID", or "CANCELLED".
+        amount (dict): Dictionary representing the order amount. This contains subfields like the actual amount, amountFee, amountNet, and the exchange rate.
+        extrenal_id (str): External identifier for the order.
+        customer_telegram_user_id (int, optional): Telegram user ID of the order customer.
+        created_date_time (str): ISO-8601 date-time indicating when the order was created.
+        expiration_date_time (str): ISO-8601 date-time indicating the expiration of the order timeout.
+        payment_date_time (str, optional): ISO-8601 date-time indicating when the order was paid.
+        selected_payment_option (dict): Represents the payment option selected by the user. This has subfields related to the amount, fees, net amount, and exchange rates.
 
     Note:
     The attributes are populated based on the 'items' field in the 'data' field of the API response when the status is "SUCCESS".
