@@ -99,7 +99,9 @@ class WebhookManager:
         """
 
         client_ip = request.client.host
+        logging.info(f'Incoming webhook from {client_ip}')
         if client_ip not in self.ALLOWED_IPS:
+            logging.info(f'IP {client_ip} not allowed')
             raise HTTPException(status_code=403, detail="IP not allowed")
 
         data = await request.json()
@@ -120,6 +122,7 @@ class WebhookManager:
 
         expected_signature_b64 = base64.b64encode(expected_signature).decode()
         if not hmac.compare_digest(expected_signature_b64, signature):
+            logging.info(f'Invalid signature. Expected: {expected_signature_b64} Get from header: {signature}')
             raise HTTPException(status_code=400, detail="Invalid signature")
 
         event = Event(data[0])
