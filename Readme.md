@@ -108,13 +108,13 @@ wm = WebhookManager(client=wallet_api)
 async def handle_successful_event(event: Event):
     # Handle successful payment event
     user_id = "USER_ID"
-    await bot.send_message(chat_id=user_id, text=f"Your payment for order {event.payload.id}  was successful!")
+    await bot.send_message(chat_id=user_id, text=f"Your payment for order {event.payload.order_id}  was successful!")
 
 @wm.failed_handler()
 async def handle_failed_event(event: Event):
     # Handle failed payment event
     user_id = "USER_ID"
-    await bot.send_message(chat_id=user_id, text=f"Your payment for order {event.payload.id} failed. Please try again.")
+    await bot.send_message(chat_id=user_id, text=f"Your payment for order {event.payload.order_id} failed. Please try again.")
 
 async def on_startup(dp):
     await bot.send_message(chat_id="YOUR_ADMIN_ID", text="Bot has started!")
