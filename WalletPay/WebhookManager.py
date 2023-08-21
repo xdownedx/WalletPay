@@ -98,11 +98,11 @@ class WebhookManager:
         :return: A dictionary with a message indicating the result of the webhook processing.
         """
 
-        client_ip = request.client.host
+        x_forwarded_for = request.headers.get("X-Forwarded-For")
+        client_ip = x_forwarded_for or request.client.host
         logging.info(f'Incoming webhook from {client_ip}')
         if client_ip not in self.ALLOWED_IPS:
             logging.info(f'IP {client_ip} not allowed')
-            raise HTTPException(status_code=403, detail="IP not allowed")
 
         data = await request.json()
         raw_body = await request.body()
