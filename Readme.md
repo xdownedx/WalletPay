@@ -1,4 +1,9 @@
-# WalletPay API Client
+![MIT License](https://img.shields.io/pypi/l/aiogram.svg?style=flat-square)
+![PyPi Package Version](https://img.shields.io/pypi/v/walletpay.svg?style=flat-square)
+![Downloads](https://img.shields.io/pypi/dm/walletpay.svg?style=flat-square)
+![Supported python versions](https://img.shields.io/pypi/pyversions/walletpay.svg?style=flat-square)
+
+# **WalletPay** API Client
 
 A Python client for interacting with the [WalletPay](https://docs.wallet.tg/pay/#tag/Order-Reconciliation/operation/getOrderAmount) API.
 
