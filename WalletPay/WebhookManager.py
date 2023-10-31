@@ -137,10 +137,10 @@ class WebhookManager:
         else:
             return {"message": "Webhook received with unknown status!"}
 
-    def register_webhook_endpoint(self, endpoint: str = '/wp_webhook'):
+    def register_webhook_endpoint(self):
         """
         Register the webhook endpoint in the FastAPI application.
 
         :param endpoint: The endpoint to register. Default is '/wp_webhook'.
         """
-        self.app.post(endpoint)(self._handle_webhook)
+        self.app.post(self.webhook_endpoint)(self._handle_webhook)
