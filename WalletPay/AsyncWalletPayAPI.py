@@ -1,3 +1,4 @@
+import json
 import aiohttp
 from typing import Optional, Dict, List, Callable
 from WalletPay.types import WalletPayException
@@ -89,7 +90,7 @@ class AsyncWalletPayAPI:
         if fail_return_url:
             data["failReturnUrl"] = fail_return_url
         if custom_data:
-            data["customData"] = custom_data
+            data["customData"] = json.dumps(custom_data)
 
         response_data = await self._make_request("POST", "order", data)
         if response_data.get("status") == "SUCCESS":

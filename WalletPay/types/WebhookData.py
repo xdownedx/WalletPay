@@ -1,4 +1,6 @@
-from typing import Dict
+import json
+from optparse import Option
+from typing import Dict, Optional, Union
 
 
 class Event:
@@ -13,6 +15,7 @@ class Event:
 
     :param data: A dictionary containing the event data.
     """
+
     def __init__(self, data: Dict):
         self.event_id = data["eventId"]
         self.eventDateTime = data["eventDateTime"]
@@ -35,15 +38,41 @@ class Payload:
         order_completed_datetime (str): ISO 8601 timestamp indicating the time of order completion, in UTC.
     """
 
+    def __parse_custom_data(
+        self, custom_data: Optional[str]
+    ) -> Optional[Union[Dict, str]]:
+        """
+        The function `__parse_custom_data` takes in a string `custom_data` and tries to parse it as JSON,
+        returning the parsed JSON if successful, or the original string if parsing fails.
+
+        :param custom_data: The `custom_data` parameter is a string that represents custom data. It is an
+        optional parameter, meaning it can be `None` or a string value
+        :type custom_data: Optional[str]
+        :return: either a dictionary or a string. If the `custom_data` parameter is not empty, it tries to
+        parse it as JSON using `json.loads()`. If the parsing is successful, it returns the parsed
+        dictionary. If there is a JSONDecodeError, it returns the original `custom_data` as a string. If
+        `custom_data` is empty, it returns `None`.
+        """
+        if custom_data:
+            try:
+                return json.loads(custom_data)
+            except json.JSONDecodeError:
+                return custom_data
+
     def __init__(self, payload: Dict):
         self.order_id = payload["id"]
         self.order_number = payload["number"]
         self.external_id = payload["externalId"]
         self.status = payload.get("status")
-        self.custom_data = payload.get("customData")
+        self.custom_data = self.__parse_custom_data(
+            custom_data=payload.get("custom_data")
+        )
         self.order_amount = MoneyAmount(payload["orderAmount"])
-        self.selected_payment_option = PaymentOption(
-            payload["selectedPaymentOption"]) if "selectedPaymentOption" in payload else None
+        self.selected_payment_option = (
+            PaymentOption(payload["selectedPaymentOption"])
+            if "selectedPaymentOption" in payload
+            else None
+        )
         self.order_completed_datetime = payload["orderCompletedDateTime"]
 
 

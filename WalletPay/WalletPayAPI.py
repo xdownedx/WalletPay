@@ -90,7 +90,7 @@ class WalletPayAPI:
         if fail_return_url:
             data["failReturnUrl"] = fail_return_url
         if custom_data:
-            data["customData"] = custom_data
+            data["customData"] = json.dumps(custom_data)
 
         response_data = self._make_request("POST", "order", data)
         if response_data.get("status") == "SUCCESS":

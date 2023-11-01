@@ -140,7 +140,5 @@ class WebhookManager:
     def register_webhook_endpoint(self):
         """
         Register the webhook endpoint in the FastAPI application.
-
-        :param endpoint: The endpoint to register. Default is '/wp_webhook'.
         """
         self.app.post(self.webhook_endpoint)(self._handle_webhook)
