@@ -59,6 +59,8 @@ class Payload:
             except json.JSONDecodeError:
                 return custom_data
 
+        return None
+
     def __init__(self, payload: Dict):
         self.order_id = payload["id"]
         self.order_number = payload["number"]
