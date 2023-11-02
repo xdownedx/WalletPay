@@ -77,8 +77,8 @@ class Payload:
         # The line of code `self.custom_data: Union[str, Dict[str, Any]] =
         # self.__parse_custom_data(custom_data=payload.get("custom_data"))` is initializing the `custom_data`
         # attribute of the `Payload` class.
-        self.custom_data: Union[str, Dict[str, Any]] = self.__parse_custom_data(
-            custom_data=payload.get("custom_data")
+        self.custom_data: Optional[Union[str, Dict[str, Any]]] = self.__parse_custom_data(
+            custom_data=payload.get("customData")
         )
         self.order_amount: MoneyAmount = MoneyAmount(payload["orderAmount"])
 
