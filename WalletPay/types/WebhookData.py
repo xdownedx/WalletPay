@@ -1,3 +1,4 @@
+import datetime
 import json
 from optparse import Option
 from typing import Dict, Optional, Union
@@ -18,7 +19,9 @@ class Event:
 
     def __init__(self, data: Dict):
         self.event_id = data["eventId"]
-        self.eventDateTime = data["eventDateTime"]
+        self.eventDateTime: datetime.datetime = datetime.datetime.fromisoformat(
+            data["eventDateTime"]
+        )
         self.type = data["type"]
         self.payload = Payload(payload=data["payload"])
 
@@ -75,7 +78,11 @@ class Payload:
             if "selectedPaymentOption" in payload
             else None
         )
-        self.order_completed_datetime = payload["orderCompletedDateTime"]
+        self.completed_date_time = payload["completedDateTime"]
+        if self.completed_date_time:
+            self.completed_date_time: datetime.datetime = (
+                datetime.datetime.fromisoformat(self.completed_date_time)
+            )
 
 
 class MoneyAmount:

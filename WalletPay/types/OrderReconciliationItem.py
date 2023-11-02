@@ -1,4 +1,5 @@
 from typing import Dict
+import datetime
 from .WebhookData import MoneyAmount, PaymentOption
 
 
@@ -12,9 +13,9 @@ class OrderReconciliationItem:
         amount (dict): Dictionary representing the order amount. This contains subfields like the actual amount, amountFee, amountNet, and the exchange rate.
         extrenal_id (str): External identifier for the order.
         customer_telegram_user_id (int, optional): Telegram user ID of the order customer.
-        created_date_time (str): ISO-8601 date-time indicating when the order was created.
-        expiration_date_time (str): ISO-8601 date-time indicating the expiration of the order timeout.
-        payment_date_time (str, optional): ISO-8601 date-time indicating when the order was paid.
+        created_date_time (datetime): ISO-8601 date-time indicating when the order was created.
+        expiration_date_time (datetime): ISO-8601 date-time indicating the expiration of the order timeout.
+        payment_date_time (datetime, optional): ISO-8601 date-time indicating when the order was paid.
         selected_payment_option (dict): Represents the payment option selected by the user. This has subfields related to the amount, fees, net amount, and exchange rates.
 
     Note:
@@ -33,11 +34,22 @@ class OrderReconciliationItem:
         self.extrenal_id = data["externalId"]
         # The customerTelegramUserId and paymentDateTime fields are optional, they are fetched using the get() method.
         self.customer_telegram_user_id = data.get("customerTelegramUserId")
-        self.created_date_time = data["createdDateTime"]
-        self.expiration_date_time = data["expirationDateTime"]
+        self.created_date_time: datetime.datetime = datetime.datetime.fromisoformat(
+            data["createdDateTime"]
+        )
+        self.expiration_date_time: datetime.datetime = datetime.datetime.fromisoformat(
+            data["expirationDateTime"]
+        )
         self.payment_date_time = data.get("paymentDateTime")
-        self.selected_payment_option = PaymentOption(
-            data["selectedPaymentOption"]) if "selectedPaymentOption" in data else None
+        if self.payment_date_time:
+            self.payment_date_time: datetime.datetime = datetime.datetime.fromisoformat(
+                self.payment_date_time
+            )
+        self.selected_payment_option = (
+            PaymentOption(data["selectedPaymentOption"])
+            if "selectedPaymentOption" in data
+            else None
+        )
 
     def __str__(self) -> str:
         """
@@ -45,5 +57,7 @@ class OrderReconciliationItem:
 
         :return: String representation of the OrderReconciliationItem.
         """
-        return (f"OrderReconciliationItem(id={self.id}, status={self.status}, "
-                f"amount={self.amount.amount, self.amount.currencyCode}, extrenal_id={self.extrenal_id})")
+        return (
+            f"OrderReconciliationItem(id={self.id}, status={self.status}, "
+            f"amount={self.amount.amount, self.amount.currencyCode}, extrenal_id={self.extrenal_id})"
+        )
