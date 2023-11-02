@@ -90,15 +90,10 @@ class Payload:
             if "selectedPaymentOption" in payload
             else None
         )
-        self.completed_date_time: Optional[datetime.datetime] = None
 
-        # The code `if iso_completed_date_time := payload["completedDateTime"]:` is using the walrus
-        # operator `:=` to assign the value of `payload["completedDateTime"]` to the variable
-        # `iso_completed_date_time` and also checks if the value is truthy (not None or empty).
-        if iso_completed_date_time := payload["completedDateTime"]:
-            self.completed_date_time: datetime.datetime = (
-                datetime.datetime.fromisoformat(iso_completed_date_time)
-            )
+        self.completed_date_time: datetime.datetime = (
+            datetime.datetime.fromisoformat(payload["orderCompletedDateTime"])
+        )
 
 
 class MoneyAmount:
