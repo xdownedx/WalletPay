@@ -26,8 +26,13 @@ class WebhookManager:
 
     ALLOWED_IPS = {"172.255.248.29", "172.255.248.12", "127.0.0.1"}
 
-    def __init__(self, client: Union[WalletPayAPI, AsyncWalletPayAPI], host: str = "0.0.0.0", port: int = 9123,
-                 webhook_endpoint: str = "/wp_webhook"):
+    def __init__(
+        self,
+        client: Union[WalletPayAPI, AsyncWalletPayAPI],
+        host: str = "0.0.0.0",
+        port: int = 9123,
+        webhook_endpoint: str = "/wp_webhook",
+    ):
         """
         Initialize the WebhookManager.
 
@@ -42,11 +47,12 @@ class WebhookManager:
         self.port: int = port
         self.api_key: str = client.api_key
         if webhook_endpoint[0] != "/":
-            self.webhook_endpoint: str= f"/{webhook_endpoint}"
+            self.webhook_endpoint: str = f"/{webhook_endpoint}"
         else:
             self.webhook_endpoint: str = webhook_endpoint
 
         self.app: FastAPI = FastAPI()
+        self.client: Union[AsyncWalletPayAPI, WalletPayAPI] = client
 
     async def start(self):
         """
@@ -54,10 +60,20 @@ class WebhookManager:
         """
         if self.app:
             import uvicorn
+
             self.register_webhook_endpoint()
-            logging.info(f"Webhook is listening at https://{self.host}:{self.port}{self.webhook_endpoint}")
+            logging.info(
+                f"Webhook is listening at https://{self.host}:{self.port}{self.webhook_endpoint}"
+            )
             runner = uvicorn.Server(
-                config=uvicorn.Config(self.app, host=self.host, port=self.port, access_log=False, log_level="error"))
+                config=uvicorn.Config(
+                    self.app,
+                    host=self.host,
+                    port=self.port,
+                    access_log=False,
+                    log_level="error",
+                )
+            )
             await runner.serve()
 
     def successful_handler(self):
@@ -99,9 +115,9 @@ class WebhookManager:
         """
         x_forwarded_for = request.headers.get("X-Forwarded-For")
         client_ip = x_forwarded_for or request.client.host
-        logging.info(f'Incoming webhook from {client_ip}')
+        logging.info(f"Incoming webhook from {client_ip}")
         if client_ip not in self.ALLOWED_IPS:
-            logging.info(f'IP {client_ip} not allowed')
+            logging.info(f"IP {client_ip} not allowed")
             raise HTTPException(status_code=403, detail="IP not allowed")
 
         data = await request.json()
@@ -115,14 +131,16 @@ class WebhookManager:
         message = f"{method}.{path}.{timestamp}.{base64.b64encode(raw_body).decode()}"
 
         expected_signature = hmac.new(
-            bytes(self.api_key, 'utf-8'),
-            msg=bytes(message, 'utf-8'),
-            digestmod=hmac._hashlib.sha256
+            bytes(self.api_key, "utf-8"),
+            msg=bytes(message, "utf-8"),
+            digestmod=hmac._hashlib.sha256,
         ).digest()
 
         expected_signature_b64 = base64.b64encode(expected_signature).decode()
         if not hmac.compare_digest(expected_signature_b64, signature):
-            logging.info(f'Invalid signature. Expected: {expected_signature_b64} Get from header: {signature}')
+            logging.info(
+                f"Invalid signature. Expected: {expected_signature_b64} Get from header: {signature}"
+            )
             raise HTTPException(status_code=400, detail="Invalid signature")
 
         event = Event(data[0])
