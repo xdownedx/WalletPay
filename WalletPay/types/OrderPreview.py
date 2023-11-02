@@ -31,7 +31,7 @@ class OrderPreview:
         :param data: Dictionary containing order preview details.
         """
         self.id: int = data["id"]
-        self.status: str= data["status"]
+        self.status: str = data["status"]
         self.number: str = data["number"]
         self.amount: MoneyAmount = MoneyAmount(data["amount"])
         self.created_date_time: datetime.datetime = datetime.datetime.fromisoformat(

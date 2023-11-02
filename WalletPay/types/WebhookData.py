@@ -95,8 +95,8 @@ class MoneyAmount:
     """
 
     def __init__(self, data: Dict):
-        self.currencyCode = data["currencyCode"]
-        self.amount = data["amount"]
+        self.currencyCode: str = data["currencyCode"]
+        self.amount: int = data["amount"]
 
 
 class PaymentOption:
