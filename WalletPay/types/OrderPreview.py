@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Optional
 import datetime
 from .WebhookData import MoneyAmount
 
@@ -30,10 +30,10 @@ class OrderPreview:
 
         :param data: Dictionary containing order preview details.
         """
-        self.id = data["id"]
-        self.status = data["status"]
-        self.number = data["number"]
-        self.amount = MoneyAmount(data["amount"])
+        self.id: int = data["id"]
+        self.status: str= data["status"]
+        self.number: str = data["number"]
+        self.amount: MoneyAmount = MoneyAmount(data["amount"])
         self.created_date_time: datetime.datetime = datetime.datetime.fromisoformat(
             data["createdDateTime"]
         )
@@ -41,13 +41,13 @@ class OrderPreview:
             data["expirationDateTime"]
         )
         # The completedDateTime field is optional, so it's fetched with the get() method.
-        self.completed_date_time = data.get("completedDateTime")
-        if self.completed_date_time:
+        self.completed_date_time: Optional[datetime.datetime] = None
+        if completed_iso_date_time := data.get("completedDateTime"):
             self.completed_date_time: datetime.datetime = (
-                datetime.datetime.fromisoformat(self.completed_date_time)
+                datetime.datetime.fromisoformat(completed_iso_date_time)
             )
-        self.pay_link = data["payLink"]
-        self.direct_pay_link = data["directPayLink"]
+        self.pay_link: str = data["payLink"]
+        self.direct_pay_link: str = data["directPayLink"]
 
     def __str__(self) -> str:
         """

@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Optional
 import datetime
 from .WebhookData import MoneyAmount, PaymentOption
 
@@ -28,22 +28,23 @@ class OrderReconciliationItem:
 
         :param data: Dictionary containing details of an order reconciliation item.
         """
-        self.id = data["id"]
-        self.status = data["status"]
-        self.amount = MoneyAmount(data["amount"])
-        self.extrenal_id = data["externalId"]
+        self.id: int = data["id"]
+        self.status: str = data["status"]
+        self.amount: MoneyAmount = MoneyAmount(data["amount"])
+        self.extrenal_id: str = data["externalId"]
         # The customerTelegramUserId and paymentDateTime fields are optional, they are fetched using the get() method.
-        self.customer_telegram_user_id = data.get("customerTelegramUserId")
+        self.customer_telegram_user_id: Optional[int] = data.get("customerTelegramUserId")
         self.created_date_time: datetime.datetime = datetime.datetime.fromisoformat(
             data["createdDateTime"]
         )
         self.expiration_date_time: datetime.datetime = datetime.datetime.fromisoformat(
             data["expirationDateTime"]
         )
-        self.payment_date_time = data.get("paymentDateTime")
-        if self.payment_date_time:
+        self.payment_date_time: Optional[datetime.datetime] = None
+
+        if payment_iso_date_time := data.get("paymentDateTime"):
             self.payment_date_time: datetime.datetime = datetime.datetime.fromisoformat(
-                self.payment_date_time
+                payment_iso_date_time
             )
         self.selected_payment_option = (
             PaymentOption(data["selectedPaymentOption"])
