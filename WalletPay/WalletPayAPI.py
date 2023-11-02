@@ -18,7 +18,9 @@ class WalletPayAPI:
         """
         self.api_key = api_key
 
-    def _make_request(self, method: str, endpoint: str, data: Optional[Dict] = None) -> Dict:
+    def _make_request(
+        self, method: str, endpoint: str, data: Optional[Dict] = None
+    ) -> Dict:
         """
         Internal method to perform API requests.
 
@@ -30,9 +32,9 @@ class WalletPayAPI:
         Source: https://docs.wallet.tg/pay/#api
         """
         headers = {
-            'Wpay-Store-Api-Key': self.api_key,
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
+            "Wpay-Store-Api-Key": self.api_key,
+            "Content-Type": "application/json",
+            "Accept": "application/json",
         }
         url = self.BASE_URL + endpoint
 
@@ -54,10 +56,18 @@ class WalletPayAPI:
         except requests.RequestException as e:
             raise WalletPayException(f"API request failed: {e}")
 
-    def create_order(self, amount: Decimal, currency_code: str, description: str, external_id: str,
-                     timeout_seconds: int, customer_telegram_user_id: str,
-                     return_url: Optional[str] = None, fail_return_url: Optional[str] = None,
-                     custom_data: Optional[Dict] = None) -> OrderPreview:
+    def create_order(
+        self,
+        amount: Decimal,
+        currency_code: str,
+        description: str,
+        external_id: str,
+        timeout_seconds: int,
+        customer_telegram_user_id: str,
+        return_url: Optional[str] = None,
+        fail_return_url: Optional[str] = None,
+        custom_data: Optional[Dict] = None,
+    ) -> OrderPreview:
         """
         Create a new order.
 
@@ -76,14 +86,11 @@ class WalletPayAPI:
         Source: https://docs.wallet.tg/pay/#create-order
         """
         data = {
-            "amount": {
-                "currencyCode": currency_code,
-                "amount": amount
-            },
+            "amount": {"currencyCode": currency_code, "amount": amount},
             "description": description,
             "externalId": external_id,
             "timeoutSeconds": timeout_seconds,
-            "customerTelegramUserId": customer_telegram_user_id
+            "customerTelegramUserId": customer_telegram_user_id,
         }
         if return_url:
             data["returnUrl"] = return_url
@@ -121,7 +128,9 @@ class WalletPayAPI:
 
         Source: https://docs.wallet.tg/pay/#get-order-list
         """
-        response_data = self._make_request("GET", f"reconciliation/order-list?offset={offset}&count={count}")
+        response_data = self._make_request(
+            "GET", f"reconciliation/order-list?offset={offset}&count={count}"
+        )
         if response_data.get("status") == "SUCCESS":
             orders_data = response_data.get("data", {}).get("items", [])
             return [OrderReconciliationItem(order_data) for order_data in orders_data]

@@ -42,10 +42,16 @@ class OrderReconciliationItem:
         )
         self.payment_date_time: Optional[datetime.datetime] = None
 
+        # This code is checking if the key "paymentDateTime" exists in the `data` dictionary. If it
+        # does, it assigns the value of `data["paymentDateTime"]` to the variable
+        # `payment_iso_date_time` using the walrus operator `:=`.
         if payment_iso_date_time := data.get("paymentDateTime"):
             self.payment_date_time: datetime.datetime = datetime.datetime.fromisoformat(
                 payment_iso_date_time
             )
+
+        # The code snippet is assigning the value of `data["selectedPaymentOption"]` to the
+        # `selected_payment_option` attribute of the `OrderReconciliationItem` object.
         self.selected_payment_option = (
             PaymentOption(data["selectedPaymentOption"])
             if "selectedPaymentOption" in data

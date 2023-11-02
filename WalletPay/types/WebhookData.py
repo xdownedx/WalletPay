@@ -1,7 +1,6 @@
 import datetime
 import json
-from optparse import Option
-from typing import Dict, Optional, Union
+from typing import Any, Dict, Optional, Union
 
 
 class Event:
@@ -18,12 +17,17 @@ class Event:
     """
 
     def __init__(self, data: Dict):
-        self.event_id = data["eventId"]
+        self.event_id: str = data["eventId"]
+
+        # The line of code `self.eventDateTime: datetime.datetime =
+        # datetime.datetime.fromisoformat(data["eventDateTime"])` is initializing the `eventDateTime`
+        # attribute of the `Event` class.
         self.eventDateTime: datetime.datetime = datetime.datetime.fromisoformat(
             data["eventDateTime"]
         )
-        self.type = data["type"]
-        self.payload = Payload(payload=data["payload"])
+
+        self.type: str = data["type"]
+        self.payload: Payload = Payload(payload=data["payload"])
 
 
 class Payload:
@@ -65,23 +69,35 @@ class Payload:
         return None
 
     def __init__(self, payload: Dict):
-        self.order_id = payload["id"]
-        self.order_number = payload["number"]
-        self.external_id = payload["externalId"]
-        self.status = payload.get("status")
-        self.custom_data = self.__parse_custom_data(
+        self.order_id: int = payload["id"]
+        self.order_number: int = payload["number"]
+        self.external_id: str = payload["externalId"]
+        self.status: str = payload.get("status")
+
+        # The line of code `self.custom_data: Union[str, Dict[str, Any]] =
+        # self.__parse_custom_data(custom_data=payload.get("custom_data"))` is initializing the `custom_data`
+        # attribute of the `Payload` class.
+        self.custom_data: Union[str, Dict[str, Any]] = self.__parse_custom_data(
             custom_data=payload.get("custom_data")
         )
-        self.order_amount = MoneyAmount(payload["orderAmount"])
-        self.selected_payment_option = (
+        self.order_amount: MoneyAmount = MoneyAmount(payload["orderAmount"])
+
+        # The line of code `self.selected_payment_option: Optional[PaymentOption] =
+        # (PaymentOption(payload["selectedPaymentOption"]) if "selectedPaymentOption" in payload else
+        # None)` is initializing the `selected_payment_option` attribute of the `Payload` class.
+        self.selected_payment_option: Optional[PaymentOption] = (
             PaymentOption(payload["selectedPaymentOption"])
             if "selectedPaymentOption" in payload
             else None
         )
-        self.completed_date_time = payload["completedDateTime"]
-        if self.completed_date_time:
+        self.completed_date_time: Optional[datetime.datetime] = None
+
+        # The code `if iso_completed_date_time := payload["completedDateTime"]:` is using the walrus
+        # operator `:=` to assign the value of `payload["completedDateTime"]` to the variable
+        # `iso_completed_date_time` and also checks if the value is truthy (not None or empty).
+        if iso_completed_date_time := payload["completedDateTime"]:
             self.completed_date_time: datetime.datetime = (
-                datetime.datetime.fromisoformat(self.completed_date_time)
+                datetime.datetime.fromisoformat(iso_completed_date_time)
             )
 
 
@@ -111,7 +127,7 @@ class PaymentOption:
     """
 
     def __init__(self, data: Dict):
-        self.amount = MoneyAmount(data["amount"])
-        self.amountFee = MoneyAmount(data["amountFee"])
-        self.amountNet = MoneyAmount(data["amountNet"])
-        self.exchangeRate = data["exchangeRate"]
+        self.amount: MoneyAmount = MoneyAmount(data["amount"])
+        self.amountFee: MoneyAmount = MoneyAmount(data["amountFee"])
+        self.amountNet: MoneyAmount = MoneyAmount(data["amountNet"])
+        self.exchangeRate: str = data["exchangeRate"]

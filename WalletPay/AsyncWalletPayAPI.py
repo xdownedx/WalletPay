@@ -17,7 +17,9 @@ class AsyncWalletPayAPI:
         """
         self.api_key = api_key
 
-    async def _make_request(self, method: str, endpoint: str, data: Optional[Dict] = None) -> Dict:
+    async def _make_request(
+        self, method: str, endpoint: str, data: Optional[Dict] = None
+    ) -> Dict:
         """
         Internal method to perform API requests.
 
@@ -29,16 +31,18 @@ class AsyncWalletPayAPI:
         Source: https://docs.wallet.tg/pay/#api
         """
         headers = {
-            'Wpay-Store-Api-Key': self.api_key,
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
+            "Wpay-Store-Api-Key": self.api_key,
+            "Content-Type": "application/json",
+            "Accept": "application/json",
         }
         url = self.BASE_URL + endpoint
 
         try:
             async with aiohttp.ClientSession() as session:
                 if method == "POST":
-                    async with session.post(url, headers=headers, json=data) as response:
+                    async with session.post(
+                        url, headers=headers, json=data
+                    ) as response:
                         response_data = await response.json()
                 elif method == "GET":
                     async with session.get(url, headers=headers) as response:
@@ -47,17 +51,27 @@ class AsyncWalletPayAPI:
                     raise WalletPayException("Invalid HTTP method")
 
                 if response.status != 200:
-                    raise WalletPayException(response_data.get("message", "Unknown error"))
+                    raise WalletPayException(
+                        response_data.get("message", "Unknown error")
+                    )
 
                 return response_data
 
         except aiohttp.ClientError as e:
             raise WalletPayException(f"API request failed: {e}")
 
-    async def create_order(self, amount: float, currency_code: str, description: str, external_id: str,
-                           timeout_seconds: int, customer_telegram_user_id: str,
-                           return_url: Optional[str] = None, fail_return_url: Optional[str] = None,
-                           custom_data: Optional[Dict] = None) -> OrderPreview:
+    async def create_order(
+        self,
+        amount: float,
+        currency_code: str,
+        description: str,
+        external_id: str,
+        timeout_seconds: int,
+        customer_telegram_user_id: str,
+        return_url: Optional[str] = None,
+        fail_return_url: Optional[str] = None,
+        custom_data: Optional[Dict] = None,
+    ) -> OrderPreview:
         """
         Create a new order.
 
@@ -76,14 +90,11 @@ class AsyncWalletPayAPI:
         Source: https://docs.wallet.tg/pay/#create-order
         """
         data = {
-            "amount": {
-                "currencyCode": currency_code,
-                "amount": amount
-            },
+            "amount": {"currencyCode": currency_code, "amount": amount},
             "description": description,
             "externalId": external_id,
             "timeoutSeconds": timeout_seconds,
-            "customerTelegramUserId": customer_telegram_user_id
+            "customerTelegramUserId": customer_telegram_user_id,
         }
         if return_url:
             data["returnUrl"] = return_url
@@ -111,7 +122,9 @@ class AsyncWalletPayAPI:
             return OrderPreview(response_data.get("data"))
         raise WalletPayException("Failed to retrieve order preview")
 
-    async def get_order_list(self, offset: int, count: int) -> List[OrderReconciliationItem]:
+    async def get_order_list(
+        self, offset: int, count: int
+    ) -> List[OrderReconciliationItem]:
         """
         Retrieve a list of orders.
 
@@ -121,7 +134,9 @@ class AsyncWalletPayAPI:
 
         Source: https://docs.wallet.tg/pay/#get-order-list
         """
-        response_data = await self._make_request("GET", f"reconciliation/order-list?offset={offset}&count={count}")
+        response_data = await self._make_request(
+            "GET", f"reconciliation/order-list?offset={offset}&count={count}"
+        )
         if response_data.get("status") == "SUCCESS":
             orders_data = response_data.get("data", {}).get("items", [])
             return [OrderReconciliationItem(order_data) for order_data in orders_data]

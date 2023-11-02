@@ -40,12 +40,16 @@ class OrderPreview:
         self.expiration_date_time: datetime.datetime = datetime.datetime.fromisoformat(
             data["expirationDateTime"]
         )
-        # The completedDateTime field is optional, so it's fetched with the get() method.
         self.completed_date_time: Optional[datetime.datetime] = None
+
+        # This code block is checking if the "completedDateTime" key exists in the `data` dictionary. If it
+        # does, it assigns the value of `data["completedDateTime"]` to the variable `completed_iso_date_time`
+        # using the walrus operator `:=`.
         if completed_iso_date_time := data.get("completedDateTime"):
             self.completed_date_time: datetime.datetime = (
                 datetime.datetime.fromisoformat(completed_iso_date_time)
             )
+
         self.pay_link: str = data["payLink"]
         self.direct_pay_link: str = data["directPayLink"]
 
