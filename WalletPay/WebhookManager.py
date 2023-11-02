@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Request, HTTPException
 from .types import Event
-from typing import Union
+from typing import Callable, List, Union
 from . import WalletPayAPI, AsyncWalletPayAPI
 import logging
 import hmac
@@ -36,17 +36,17 @@ class WebhookManager:
         :param port: The port to run the FastAPI server on. Default is 9123.
         :param webhook_endpoint: The endpoint to listen for incoming webhooks. Default is "/wp_webhook".
         """
-        self.successful_callbacks = []
-        self.failed_callbacks = []
-        self.host = host
-        self.port = port
-        self.api_key = client.api_key
+        self.successful_callbacks: List[Callable] = []
+        self.failed_callbacks: List[Callable] = []
+        self.host: str = host
+        self.port: int = port
+        self.api_key: str = client.api_key
         if webhook_endpoint[0] != "/":
-            self.webhook_endpoint = f"/{webhook_endpoint}"
+            self.webhook_endpoint: str= f"/{webhook_endpoint}"
         else:
-            self.webhook_endpoint = webhook_endpoint
+            self.webhook_endpoint: str = webhook_endpoint
 
-        self.app = FastAPI()
+        self.app: FastAPI = FastAPI()
 
     async def start(self):
         """
@@ -128,11 +128,11 @@ class WebhookManager:
         event = Event(data[0])
         if event.type == "ORDER_PAID":
             for callback in self.successful_callbacks:
-                await callback(event)
+                await callback(event=event, client=self.client)
             return {"message": "Successful event processed!"}
         elif event.type == "ORDER_FAILED":
             for callback in self.failed_callbacks:
-                await callback(event)
+                await callback(event=event, client=self.client)
             return {"message": "Failed event processed!"}
         else:
             return {"message": "Webhook received with unknown status!"}
