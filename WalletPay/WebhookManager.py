@@ -1,6 +1,7 @@
+from wsgiref.util import request_uri
 from fastapi import FastAPI, Request, HTTPException
 from .types import Event
-from typing import Callable, List, Union
+from typing import Any, Callable, Dict, List, Optional, Union
 from . import WalletPayAPI, AsyncWalletPayAPI
 import logging
 import hmac
@@ -102,6 +103,44 @@ class WebhookManager:
 
         return decorator
 
+    def __get_x_forwarded_for(self, headers: Dict[str, Any]) -> Optional[str]:
+        """
+        The function checks if any of the IP addresses in the "X-Forwarded-For" header are in the list of
+        allowed IPs.
+
+        :param headers: A dictionary containing the headers of an HTTP request
+        :type headers: Dict[str, Any]
+        :return: a boolean value. It returns True if any of the IP addresses in the "X-Forwarded-For" header
+        are found in the ALLOWED_IPS list. Otherwise, it returns False.
+        """
+        if x_forwarded_for := headers.get("X-Forwarded-For"):
+            forwarded_for_ips: List[str] = x_forwarded_for.split(", ")
+
+            for ip in forwarded_for_ips:
+                if ip in self.ALLOWED_IPS:
+                    return ip
+
+    def __get_client_ip(self, request: Request) -> str:
+        """
+        The function `__get_client_ip` retrieves the client's IP address from the request, checks if it is
+        allowed, and returns it.
+
+        :param request: The `request` parameter is of type `Request`, which is likely an object representing
+        an HTTP request. It contains information about the request, such as headers, client host, etc
+        :type request: Request
+        :return: the client IP address as a string.
+        """
+        x_forwarded_for: Optional[str] = self.__get_x_forwarded_for(headers=request.headers)
+        client_ip: str = request.client.host
+
+        if x_forwarded_for:
+            client_ip = x_forwarded_for
+        elif client_ip not in self.ALLOWED_IPS:
+            logging.info(f"IP {client_ip} not allowed")
+            raise HTTPException(status_code=403, detail="IP not allowed")
+
+        return client_ip
+
     async def _handle_webhook(self, request: Request):
         """
         Internal method to handle incoming webhooks.
@@ -113,12 +152,9 @@ class WebhookManager:
         :param request: The incoming request object.
         :return: A dictionary with a message indicating the result of the webhook processing.
         """
-        x_forwarded_for = request.headers.get("X-Forwarded-For")
-        client_ip = x_forwarded_for or request.client.host
+        client_ip: str = self.__get_client_ip(request=request)
+
         logging.info(f"Incoming webhook from {client_ip}")
-        if client_ip not in self.ALLOWED_IPS:
-            logging.info(f"IP {client_ip} not allowed")
-            raise HTTPException(status_code=403, detail="IP not allowed")
 
         data = await request.json()
         raw_body = await request.body()
