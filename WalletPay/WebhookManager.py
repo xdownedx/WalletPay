@@ -163,7 +163,7 @@ class WebhookManager:
         signature = headers.get("Walletpay-Signature")
         timestamp = headers.get("WalletPay-Timestamp")
         method = request.method
-        path = request.url.path
+        path = request.headers.get("X-Original-URI") or request.url.path
         message = f"{method}.{path}.{timestamp}.{base64.b64encode(raw_body).decode()}"
 
         expected_signature = hmac.new(
