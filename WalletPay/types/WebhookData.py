@@ -1,4 +1,6 @@
-from typing import Dict
+import datetime
+import json
+from typing import Any, Dict, Optional, Union
 
 
 class Event:
@@ -13,11 +15,19 @@ class Event:
 
     :param data: A dictionary containing the event data.
     """
+
     def __init__(self, data: Dict):
-        self.event_id = data["eventId"]
-        self.eventDateTime = data["eventDateTime"]
-        self.type = data["type"]
-        self.payload = Payload(payload=data["payload"])
+        self.event_id: str = data["eventId"]
+
+        # The line of code `self.eventDateTime: datetime.datetime =
+        # datetime.datetime.fromisoformat(data["eventDateTime"])` is initializing the `eventDateTime`
+        # attribute of the `Event` class.
+        self.eventDateTime: datetime.datetime = datetime.datetime.fromisoformat(
+            data["eventDateTime"]
+        )
+
+        self.type: str = data["type"]
+        self.payload: Payload = Payload(payload=data["payload"])
 
 
 class Payload:
@@ -35,16 +45,55 @@ class Payload:
         order_completed_datetime (str): ISO 8601 timestamp indicating the time of order completion, in UTC.
     """
 
+    def __parse_custom_data(
+        self, custom_data: Optional[str]
+    ) -> Optional[Union[Dict, str]]:
+        """
+        The function `__parse_custom_data` takes in a string `custom_data` and tries to parse it as JSON,
+        returning the parsed JSON if successful, or the original string if parsing fails.
+
+        :param custom_data: The `custom_data` parameter is a string that represents custom data. It is an
+        optional parameter, meaning it can be `None` or a string value
+        :type custom_data: Optional[str]
+        :return: either a dictionary or a string. If the `custom_data` parameter is not empty, it tries to
+        parse it as JSON using `json.loads()`. If the parsing is successful, it returns the parsed
+        dictionary. If there is a JSONDecodeError, it returns the original `custom_data` as a string. If
+        `custom_data` is empty, it returns `None`.
+        """
+        if custom_data:
+            try:
+                return json.loads(custom_data)
+            except json.JSONDecodeError:
+                return custom_data
+
+        return None
+
     def __init__(self, payload: Dict):
-        self.order_id = payload["id"]
-        self.order_number = payload["number"]
-        self.external_id = payload["externalId"]
-        self.status = payload.get("status")
-        self.custom_data = payload.get("customData")
-        self.order_amount = MoneyAmount(payload["orderAmount"])
-        self.selected_payment_option = PaymentOption(
-            payload["selectedPaymentOption"]) if "selectedPaymentOption" in payload else None
-        self.order_completed_datetime = payload["orderCompletedDateTime"]
+        self.order_id: int = payload["id"]
+        self.order_number: int = payload["number"]
+        self.external_id: str = payload["externalId"]
+        self.status: str = payload.get("status")
+
+        # The line of code `self.custom_data: Union[str, Dict[str, Any]] =
+        # self.__parse_custom_data(custom_data=payload.get("custom_data"))` is initializing the `custom_data`
+        # attribute of the `Payload` class.
+        self.custom_data: Optional[Union[str, Dict[str, Any]]] = self.__parse_custom_data(
+            custom_data=payload.get("customData")
+        )
+        self.order_amount: MoneyAmount = MoneyAmount(payload["orderAmount"])
+
+        # The line of code `self.selected_payment_option: Optional[PaymentOption] =
+        # (PaymentOption(payload["selectedPaymentOption"]) if "selectedPaymentOption" in payload else
+        # None)` is initializing the `selected_payment_option` attribute of the `Payload` class.
+        self.selected_payment_option: Optional[PaymentOption] = (
+            PaymentOption(payload["selectedPaymentOption"])
+            if "selectedPaymentOption" in payload
+            else None
+        )
+
+        self.completed_date_time: datetime.datetime = (
+            datetime.datetime.fromisoformat(payload["orderCompletedDateTime"])
+        )
 
 
 class MoneyAmount:
@@ -57,8 +106,8 @@ class MoneyAmount:
     """
 
     def __init__(self, data: Dict):
-        self.currencyCode = data["currencyCode"]
-        self.amount = data["amount"]
+        self.currencyCode: str = data["currencyCode"]
+        self.amount: int = data["amount"]
 
 
 class PaymentOption:
@@ -73,7 +122,7 @@ class PaymentOption:
     """
 
     def __init__(self, data: Dict):
-        self.amount = MoneyAmount(data["amount"])
-        self.amountFee = MoneyAmount(data["amountFee"])
-        self.amountNet = MoneyAmount(data["amountNet"])
-        self.exchangeRate = data["exchangeRate"]
+        self.amount: MoneyAmount = MoneyAmount(data["amount"])
+        self.amountFee: MoneyAmount = MoneyAmount(data["amountFee"])
+        self.amountNet: MoneyAmount = MoneyAmount(data["amountNet"])
+        self.exchangeRate: str = data["exchangeRate"]

@@ -1,4 +1,5 @@
-from typing import Dict
+from typing import Dict, Optional
+import datetime
 from .WebhookData import MoneyAmount, PaymentOption
 
 
@@ -12,9 +13,9 @@ class OrderReconciliationItem:
         amount (dict): Dictionary representing the order amount. This contains subfields like the actual amount, amountFee, amountNet, and the exchange rate.
         extrenal_id (str): External identifier for the order.
         customer_telegram_user_id (int, optional): Telegram user ID of the order customer.
-        created_date_time (str): ISO-8601 date-time indicating when the order was created.
-        expiration_date_time (str): ISO-8601 date-time indicating the expiration of the order timeout.
-        payment_date_time (str, optional): ISO-8601 date-time indicating when the order was paid.
+        created_date_time (datetime): ISO-8601 date-time indicating when the order was created.
+        expiration_date_time (datetime): ISO-8601 date-time indicating the expiration of the order timeout.
+        payment_date_time (datetime, optional): ISO-8601 date-time indicating when the order was paid.
         selected_payment_option (dict): Represents the payment option selected by the user. This has subfields related to the amount, fees, net amount, and exchange rates.
 
     Note:
@@ -27,17 +28,35 @@ class OrderReconciliationItem:
 
         :param data: Dictionary containing details of an order reconciliation item.
         """
-        self.id = data["id"]
-        self.status = data["status"]
-        self.amount = MoneyAmount(data["amount"])
-        self.extrenal_id = data["externalId"]
+        self.id: int = data["id"]
+        self.status: str = data["status"]
+        self.amount: MoneyAmount = MoneyAmount(data["amount"])
+        self.extrenal_id: str = data["externalId"]
         # The customerTelegramUserId and paymentDateTime fields are optional, they are fetched using the get() method.
-        self.customer_telegram_user_id = data.get("customerTelegramUserId")
-        self.created_date_time = data["createdDateTime"]
-        self.expiration_date_time = data["expirationDateTime"]
-        self.payment_date_time = data.get("paymentDateTime")
-        self.selected_payment_option = PaymentOption(
-            data["selectedPaymentOption"]) if "selectedPaymentOption" in data else None
+        self.customer_telegram_user_id: Optional[int] = data.get("customerTelegramUserId")
+        self.created_date_time: datetime.datetime = datetime.datetime.fromisoformat(
+            data["createdDateTime"]
+        )
+        self.expiration_date_time: datetime.datetime = datetime.datetime.fromisoformat(
+            data["expirationDateTime"]
+        )
+        self.payment_date_time: Optional[datetime.datetime] = None
+
+        # This code is checking if the key "paymentDateTime" exists in the `data` dictionary. If it
+        # does, it assigns the value of `data["paymentDateTime"]` to the variable
+        # `payment_iso_date_time` using the walrus operator `:=`.
+        if payment_iso_date_time := data.get("paymentDateTime"):
+            self.payment_date_time: datetime.datetime = datetime.datetime.fromisoformat(
+                payment_iso_date_time
+            )
+
+        # The code snippet is assigning the value of `data["selectedPaymentOption"]` to the
+        # `selected_payment_option` attribute of the `OrderReconciliationItem` object.
+        self.selected_payment_option = (
+            PaymentOption(data["selectedPaymentOption"])
+            if "selectedPaymentOption" in data
+            else None
+        )
 
     def __str__(self) -> str:
         """
@@ -45,5 +64,7 @@ class OrderReconciliationItem:
 
         :return: String representation of the OrderReconciliationItem.
         """
-        return (f"OrderReconciliationItem(id={self.id}, status={self.status}, "
-                f"amount={self.amount.amount, self.amount.currencyCode}, extrenal_id={self.extrenal_id})")
+        return (
+            f"OrderReconciliationItem(id={self.id}, status={self.status}, "
+            f"amount={self.amount.amount, self.amount.currencyCode}, extrenal_id={self.extrenal_id})"
+        )

@@ -72,13 +72,13 @@ async def main():
 
     # Get order preview
     order_preview = await api.get_order_preview(order_id="ORDER_ID")
-    
+
     # Check if the order is paid
     if order_preview.status == "PAID":
         print("Order has been paid!")
     else:
         print("Order is not paid yet.")
-    
+
     # Get order list
     orders = await api.get_order_list(offset=0, count=10)
 
@@ -110,13 +110,13 @@ wallet_api = WalletPayAPI(api_key="YOUR_WALLET_API_KEY")
 wm = WebhookManager(client=wallet_api)
 
 @wm.successful_handler()
-async def handle_successful_event(event: Event):
+async def handle_successful_event(event: Event, client: Union[AsyncWalletPayAPI, WalletPayAPI]):
     # Handle successful payment event
     user_id = "USER_ID"
     await bot.send_message(chat_id=user_id, text=f"Your payment for order {event.payload.order_id}  was successful!")
 
 @wm.failed_handler()
-async def handle_failed_event(event: Event):
+async def handle_failed_event(event: Event, client: Union[AsyncWalletPayAPI, WalletPayAPI]):
     # Handle failed payment event
     user_id = "USER_ID"
     await bot.send_message(chat_id=user_id, text=f"Your payment for order {event.payload.order_id} failed. Please try again.")
