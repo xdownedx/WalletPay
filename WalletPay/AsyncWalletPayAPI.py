@@ -1,8 +1,12 @@
+from typing import Optional, Dict, List
+
 import aiohttp
-from typing import Optional, Dict, List, Callable
-from WalletPay.types import WalletPayException
+
 from WalletPay.types import OrderPreview
 from WalletPay.types import OrderReconciliationItem
+from WalletPay.types import WalletPayException
+from WalletPay.types.Exception import CreateOrderException, GetOrderPreviewException, GetOrderListException, \
+    GetOrderAmountException
 
 
 class AsyncWalletPayAPI:
@@ -94,7 +98,7 @@ class AsyncWalletPayAPI:
         response_data = await self._make_request("POST", "order", data)
         if response_data.get("status") == "SUCCESS":
             return OrderPreview(response_data.get("data"))
-        raise WalletPayException("Failed to create order")
+        raise CreateOrderException(response_data, "Failed to create order")
 
     async def get_order_preview(self, order_id: str) -> OrderPreview:
         """
@@ -108,7 +112,7 @@ class AsyncWalletPayAPI:
         response_data = await self._make_request("GET", f"order/preview?id={order_id}")
         if response_data.get("status") == "SUCCESS":
             return OrderPreview(response_data.get("data"))
-        raise WalletPayException("Failed to retrieve order preview")
+        raise GetOrderPreviewException(response_data, "Failed to retrieve order preview")
 
     async def get_order_list(self, offset: int, count: int) -> List[OrderReconciliationItem]:
         """
@@ -124,7 +128,7 @@ class AsyncWalletPayAPI:
         if response_data.get("status") == "SUCCESS":
             orders_data = response_data.get("data", {}).get("items", [])
             return [OrderReconciliationItem(order_data) for order_data in orders_data]
-        raise WalletPayException("Failed to retrieve order list")
+        raise GetOrderListException(response_data, "Failed to retrieve order list")
 
     async def get_order_amount(self) -> int:
         """
@@ -137,4 +141,4 @@ class AsyncWalletPayAPI:
         response_data = await self._make_request("GET", "reconciliation/order-amount")
         if response_data.get("status") == "SUCCESS":
             return int(response_data.get("data", {}).get("totalAmount"))
-        raise WalletPayException("Failed to retrieve order amount")
+        raise GetOrderAmountException(response_data, "Failed to retrieve order amount")
