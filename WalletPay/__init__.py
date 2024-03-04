@@ -1,4 +1,5 @@
 from WalletPay.WalletPayAPI import WalletPayAPI
 from WalletPay.AsyncWalletPayAPI import AsyncWalletPayAPI
 from WalletPay.WebhookManager import WebhookManager
+from WalletPay.WebhookRouterManager import WebhookRouterManager
 from WalletPay import types
