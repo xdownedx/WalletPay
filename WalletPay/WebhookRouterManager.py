@@ -9,17 +9,15 @@ import base64
 router = APIRouter()
 logging.basicConfig(level=logging.INFO)
 
-class WebhookManager:
+class WebhookRouterManager:
     """
     A manager for handling webhooks from WalletPay.
 
     Attributes:
         successful_callbacks (list): A list of callback functions to handle successful events.
         failed_callbacks (list): A list of callback functions to handle failed events.
-        host (str): The host to run the FastAPI server on.
-        port (int): The port to run the FastAPI server on.
         webhook_endpoint (str): The endpoint to listen for incoming webhooks.
-        app (FastAPI): The FastAPI application instance.
+        router(APIRouter FastAPI): The APIRouter instance.
         ALLOWED_IPS (set): A set of IP addresses allowed to send webhooks.
     """
 
@@ -31,8 +29,6 @@ class WebhookManager:
         Initialize the WebhookManager.
 
         :param client:
-        :param host: The host to run the FastAPI server on. Default is "0.0.0.0".
-        :param port: The port to run the FastAPI server on. Default is 9123.
         :param webhook_endpoint: The endpoint to listen for incoming webhooks. Default is "/wp_webhook".
         """
         self.successful_callbacks = []
@@ -43,18 +39,7 @@ class WebhookManager:
         else:
             self.webhook_endpoint = webhook_endpoint
         self.router = router
-    async def start(self):
-        """
-        Start the FastAPI server to listen for incoming webhooks.
-        """
-        # if self.app:
-        #     import uvicorn
-        #     self.register_webhook_endpoint()
-        #     logging.info(f"Webhook is listening at https://{self.host}:{self.port}{self.webhook_endpoint}")
-        #     runner = uvicorn.Server(
-        #         config=uvicorn.Config(self.app, host=self.host, port=self.port, access_log=False, log_level="error"))
-        #     await runner.serve()
-
+    
     def successful_handler(self):
         """
         Decorator to register a callback function for handling successful events.
