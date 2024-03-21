@@ -60,7 +60,7 @@ class AsyncWalletPayAPI:
     async def create_order(self, amount: float, currency_code: str, description: str, external_id: str,
                            timeout_seconds: int, customer_telegram_user_id: str,
                            return_url: Optional[str] = None, fail_return_url: Optional[str] = None,
-                           custom_data: Optional[Dict] = None, auto_conversion_currency: Optional[str] = None) -> OrderPreview:
+                           custom_data: Optional[str] = None, auto_conversion_currency: Optional[str] = None) -> OrderPreview:
         """
         Create a new order.
 
