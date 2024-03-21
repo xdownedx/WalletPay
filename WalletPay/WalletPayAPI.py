@@ -57,7 +57,7 @@ class WalletPayAPI:
     def create_order(self, amount: Decimal, currency_code: str, description: str, external_id: str,
                      timeout_seconds: int, customer_telegram_user_id: str,
                      return_url: Optional[str] = None, fail_return_url: Optional[str] = None,
-                     custom_data: Optional[Dict] = None) -> OrderPreview:
+                     custom_data: Optional[Dict] = None, auto_conversion_currency: Optional[str] = None) -> OrderPreview:
         """
         Create a new order.
 
@@ -70,6 +70,7 @@ class WalletPayAPI:
         :param return_url: URL for redirection after successful payment.
         :param fail_return_url: URL for redirection after failed payment.
         :param custom_data: Additional order data.
+        :param auto_conversion_currency: Currency code for automatic conversion (e.g., "TON", "BTC", "USDT")
 
         :return: OrderPreview object with information about the created order.
 
@@ -91,6 +92,8 @@ class WalletPayAPI:
             data["failReturnUrl"] = fail_return_url
         if custom_data:
             data["customData"] = custom_data
+        if auto_conversion_currency:
+            data["autoConversionCurrency"] = auto_conversion_currency
 
         response_data = self._make_request("POST", "order", data)
         if response_data.get("status") == "SUCCESS":
