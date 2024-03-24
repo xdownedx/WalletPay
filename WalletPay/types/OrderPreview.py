@@ -11,6 +11,7 @@ class OrderPreview:
         status (str): Status of the order, can be one of "ACTIVE", "EXPIRED", "PAID", or "CANCELLED".
         number (str): A human-readable short order ID shown to customers.
         amount (dict): A dictionary representing the amount and currency of the order.
+        auto_conversion_currency (str, optional): Currency code for automatic conversion (e.g., "TON", "BTC", "USDT").
         created_date_time (str): ISO-8601 date-time indicating when the order was created.
         expiration_date_time (str): ISO-8601 date-time indicating the expiration of the order timeout.
         completed_date_time (str, optional): ISO-8601 date-time indicating when the order was completed (e.g., paid, expired).
@@ -33,6 +34,7 @@ class OrderPreview:
         self.status = data["status"]
         self.number = data["number"]
         self.amount = MoneyAmount(data["amount"])
+        self.auto_conversion_currency = data.get("autoConversionCurrency")
         self.created_date_time = data["createdDateTime"]
         self.expiration_date_time = data["expirationDateTime"]
         # The completedDateTime field is optional, so it's fetched with the get() method.
